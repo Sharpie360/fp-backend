@@ -2,9 +2,7 @@ const express = require('express');
 const request = require('request');
 const isValidURL = require('url-validation');
 
-
-
-
+const corsAdder = require('./middleware/corsAdder');
 
 const app = express();
 
@@ -14,13 +12,9 @@ app.get('/', (req, res) => {
 
 app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 
-app.use('*', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
+app.use(corsAdder);
 
-app.get('*', (req, res, next) => {
+app.get((req, res, next) => {
   const url = req.path.substring(1);
 
   const error = (req, res) => {
@@ -28,16 +22,14 @@ app.get('*', (req, res, next) => {
     return new Error('Invalid URL, please try again.');
   }
 
-  if (isValidURL(url)) {
-    request.get(url)
+  isValidURL(url) 
+    ? request.get(url)
       .pipe(res)
-      .on('error', error => next(error));
-  } else {
-    return next(error);
-  }
+      .on('error', error => next(error)) 
+    : next(error);
 });
 
-app.use('*', (err, req, res, next) => {
+app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.json({
     error: err.message,
