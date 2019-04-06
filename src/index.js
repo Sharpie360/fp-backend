@@ -6,15 +6,15 @@ const corsAdder = require('./middleware/corsAdder');
 
 const app = express();
 
+app.use(corsAdder);
+
 app.get('/', (req, res) => {
   res.send('Hello from the Filtrify Photo backend! :)');
 });
 
 app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 
-app.use(corsAdder);
-
-app.get((req, res, next) => {
+app.get('*', (req, res, next) => {
   const url = req.path.substring(1);
 
   const error = (req, res) => {
@@ -38,6 +38,6 @@ app.use((err, req, res, next) => {
 
 const port = process.env.PORT || 1337;
 
-const host = process.env.HOST || '127.0.0.1'
+const host = process.env.HOST || '127.0.0.1';
 
 app.listen(port, host, () => console.log(`Server started at ${host}:${port} | <3 RabbitWerks.js`));
