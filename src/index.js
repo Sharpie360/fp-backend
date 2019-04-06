@@ -16,6 +16,7 @@ app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 
 app.get('*', (req, res, next) => {
   const url = req.path.substring(1);
+  console.log(req.path)
 
   const error = (req, res) => {
     res.status(500);
