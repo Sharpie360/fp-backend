@@ -4,6 +4,15 @@ const isValidURL = require('url-validation');
 
 const corsAdder = require('./middleware/corsAdder');
 
+const repairURL = (url) => {
+  if (url.includes(':/') && !url.includes('://')) {
+    return `${url.split(':')[0]}:/${url.split(':')[1]}`;
+  } else {
+    return url;
+  }
+}
+
+
 const app = express();
 
 app.use(corsAdder);
@@ -15,8 +24,7 @@ app.get('/', (req, res) => {
 app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 
 app.get('*', (req, res, next) => {
-  const url = req.path.substring(1);
-  console.log(req.path)
+  const url = repairURL(req.path.substring(1));
 
   const error = (req, res) => {
     res.status(500);
